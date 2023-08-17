@@ -1,0 +1,44 @@
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 90vh;
+}
+
+.spin-loading {
+  margin: auto;
+}
+
+.content{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3rem;
+}
+
+/* .detail-content {
+  margin: 2rem 0;
+  width: 100%;
+  max-width: 20rem;
+  text-align: center;
+} */
+
+.pokemon-detail {
+  text-align: start;
+}
+
+.pokemon-detail p {
+  margin: 0.5rem 0;
+}
+
+.pokemon-img {
+  width: 100%;
+  height: auto;
+  text-align: center;
+}
+
+.search-container {
+  width: 20%;
+  margin: 1rem 0;
+}
