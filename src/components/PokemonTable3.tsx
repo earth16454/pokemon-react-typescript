@@ -30,7 +30,6 @@ const { Text } = Typography;
 const PokemonTable: React.FC = () => {
   const [pokeData, setPokeData] = useState<Pokemon[]>([]);
   const [filteredData, setFilteredData] = useState<Pokemon[]>([]);
-  const [searchValue, setSearchValue] = useState<string>("");
   const [url, setUrl] = useState("https://pokeapi.co/api/v2/pokemon/");
   const [loading, setLoading] = useState<boolean>(true);
   const [nextUrl, setNextUrl] = useState<string | undefined>();
@@ -73,10 +72,6 @@ const PokemonTable: React.FC = () => {
   useEffect(() => {
     pokeFun();
   }, []);
-
-  // useEffect(() => {
-  //   setFilteredData(pokeData);
-  // }, [pokeData]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
@@ -150,9 +145,8 @@ const PokemonTable: React.FC = () => {
           <Text>Search:</Text>
           <Search placeholder="Search..." onChange={handleSearch}></Search>
         </Space>
-        <p>{searchValue}</p>
       </div>
-      <Table dataSource={filteredData} columns={columns} pagination={{pageSize: 20}} />
+      <Table dataSource={filteredData} columns={columns} pagination={{pageSize: 20}} loading={loading} />
     </div>
   );
 };
