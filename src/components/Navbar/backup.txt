@@ -1,0 +1,22 @@
+// useEffect(() => {
+//   const initial = async () => {
+//     let pokemonList = []
+//     try {
+//       let response = await axios.get("")
+//       if(response.data && response.status){
+//         response.data.map(item => {
+//           let detailRes = await axios.get("")
+//           pokemonList.push({
+//             name: "",
+//             abilities: []
+//           })
+//         })
+       
+//       }
+//     } catch (error) {
+//       console.error(error)
+//     }
+   
+//   }
+//   initial()
+// },[])

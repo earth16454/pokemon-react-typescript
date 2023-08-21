@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, Link } from "react-router-dom";
 import axios from "axios";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import Navbar from "./Navbar";
-import { Spin, Image, Tag, Card, Divider } from "antd";
+import { Spin, Image, Tag, Card, Divider, Button } from "antd";
 import {
   Pokemon,
   Ability,
@@ -10,6 +11,7 @@ import {
   Species,
   Sprites,
   Dream_world,
+  typeColorInterface,
 } from "./interface";
 import "./detail.css";
 
@@ -23,12 +25,20 @@ const PokemonDetails: React.FC = () => {
       .get(`https://pokeapi.co/api/v2/pokemon/${id}`)
       .then((response) => {
         const data = response.data;
-        const abilities = data.abilities.map((ability: any) => ({
+        const abilities = data.abilities.map((ability: Ability) => ({
           ability: { name: ability.ability.name },
         }));
-        const types = data.types.map((type: any) => ({
+
+        const types = data.types.map((type: Types) => ({
           type: { name: type.type.name },
         }));
+
+        // const types = data.types.map((type: Types) => {
+        //   let type1: Species = type.type;
+        //   ({
+        //     type: type1.name,
+        //   });
+        // });
 
         const pokemonDetails: Pokemon = {
           id: data.id,
@@ -37,8 +47,8 @@ const PokemonDetails: React.FC = () => {
           abilities: abilities,
           sprites: data.sprites.other.dream_world,
         };
-        setLoading(false);
         setPokemon(pokemonDetails);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching Pokemon details:", error);
@@ -53,32 +63,6 @@ const PokemonDetails: React.FC = () => {
     );
   }
 
-  const type_color = {
-    normal: "#8a8a59",
-    fire: "#f09030",
-    water: "#6890f0",
-    electric: "#f8d030",
-    grass: "#78c050",
-    ice: "#98d8d8",
-    fighting: "#c03028",
-    poison: "#a040a0",
-    ground: "#e9c968",
-    flying: "#a890f0",
-    bug: "#a8b820",
-    rock: "#b8a038",
-    ghost: "#705898",
-    dragon: "#7038f8",
-    dark: "#705848",
-    steel: "#b8b8d0",
-    fairy: "#e989e8",
-  };
-
-  const cardStyle = {
-    width: "360px",
-    borderRadius: "12px",
-    boxShadow: "0 0.5rem 1rem rgba(0, 21, 41, 0.3",
-  };
-
   return loading ? (
     <>
       <Navbar />
@@ -90,6 +74,13 @@ const PokemonDetails: React.FC = () => {
     <>
       <Navbar />
       <div className="container">
+        <div className="back-link">
+          <Link to={"/"}>
+            <Button icon={<ArrowLeftOutlined />} className="btn-back">
+              Back
+            </Button>
+          </Link>
+        </div>
         <div className="content">
           <Card style={cardStyle}>
             <div className="pokemon-img">
@@ -101,12 +92,9 @@ const PokemonDetails: React.FC = () => {
               <p>ID: {pokemon.id}</p>
               <p>
                 Type:{" "}
-                {pokemon.types.map((type) => {
-                  return (
-                    <Tag style={{ backgroundColor: type.type.name }}>
-                      {type.type.name}
-                    </Tag>
-                  );
+                {pokemon.types.map((types) => {
+                  let color: string = types.type.name;
+                  return <Tag color={type_color[color]}>{types.type.name}</Tag>;
                 })}
               </p>
               <p>
@@ -121,6 +109,32 @@ const PokemonDetails: React.FC = () => {
       </div>
     </>
   );
+};
+
+const type_color: typeColorInterface = {
+  normal: "#8a8a59",
+  fire: "#f09030",
+  water: "#6890f0",
+  electric: "#f8d030",
+  grass: "#78c050",
+  ice: "#98d8d8",
+  fighting: "#c03028",
+  poison: "#a040a0",
+  ground: "#e9c968",
+  flying: "#a890f0",
+  bug: "#a8b820",
+  rock: "#b8a038",
+  ghost: "#705898",
+  dragon: "#7038f8",
+  dark: "#705848",
+  steel: "#b8b8d0",
+  fairy: "#e989e8",
+};
+
+const cardStyle = {
+  width: "360px",
+  borderRadius: "12px",
+  boxShadow: "0 0.5rem 1rem rgba(0, 21, 41, 0.3",
 };
 
 export default PokemonDetails;

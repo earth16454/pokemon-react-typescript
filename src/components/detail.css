@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 90vh;
+  height: 80vh;
 }
 
 .spin-loading {
@@ -41,4 +41,13 @@
 .search-container {
   width: 20%;
   margin: 1rem 0;
+}
+
+.back-link {
+  margin-top: 1.5rem;
+}
+
+.back-link .btn-back{
+  display: flex;
+  align-items: center;
 }

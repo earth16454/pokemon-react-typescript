@@ -1,9 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Image, Tag, Input, Spin, Space, Typography, Layout } from "antd";
+import {
+  Table,
+  Button,
+  Image,
+  Tag,
+  Input,
+  Spin,
+  Space,
+  Typography,
+  Layout,
+} from "antd";
 import axios from "axios";
 import { SearchOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import { Results, Pokemon, Species, Types, Ability, Dream_world, typeColorInterface } from "./interface";
+import {
+  Results,
+  Pokemon,
+  Species,
+  Types,
+  Ability,
+  Dream_world,
+  typeColorInterface,
+} from "./interface";
 import "./detail.css";
 import Search from "antd/es/input/Search";
 
@@ -11,7 +29,7 @@ const { Text } = Typography;
 
 const PokemonTable: React.FC = () => {
   const [pokeData, setPokeData] = useState<Pokemon[]>([]);
-  const [pokeShow, setPokeShow] = useState<Pokemon[]>([]);
+  const [filteredData, setFilteredData] = useState<Pokemon[]>([]);
   const [searchValue, setSearchValue] = useState<string>("");
   const [url, setUrl] = useState("https://pokeapi.co/api/v2/pokemon/");
   const [loading, setLoading] = useState<boolean>(true);
@@ -25,72 +43,52 @@ const PokemonTable: React.FC = () => {
       setNextUrl(res.data.next);
       setPrevUrl(res.data.previous);
       getPokemon(res.data.results);
+      console.log("Fetch !!!");
     } catch (error) {
       console.error("Error fetching data:", error);
     }
     setLoading(false);
   };
 
-  // const getPokemon = async (response: any) => {
-  //   const pokemonList: Pokemon[] = response.map(async (pokemon: any) => {
-  //     // const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.id}/`);
-  //     const response = await axios.get(pokemon.url);
-  //     const data = response.data;
-  //     return {
-  //       id: data.id,
-  //       name: data.name,
-  //       types: data.types,
-  //       abilities: data.abilities,
-  //       sprites: data.sprites.other.dream_world,
-  //     }
-  //   });
-  //   setPokeData(pokemonList);
-  //   setPokeShow(pokemonList);
-  // };
+  const getPokemon = async (response: Results[]) => {
+    const pokemonResponses = await Promise.all(
+      response.map((result: Results) => axios.get(result.url))
+    );
 
-
-  const getPokemon = async (response: any) => {
-    const pokemonList: Pokemon[] = response.map((pokemon: any) => {
+    const pokemonList: Pokemon[] = pokemonResponses.map((response: any) => {
+      const data = response.data;
       return {
-        id: parseInt(pokemon.url.split("/")[6]),
-        name: pokemon.name,
-        types: [],
-        abilities: [],
-        sprites: { other: { front_default: "" }, front_female: null },
+        id: data.id,
+        name: data.name,
+        types: data.types,
+        abilities: data.abilities,
+        sprites: data.sprites,
       };
     });
 
-    const promises: Promise<void>[] = pokemonList.map((pokemon: Pokemon) => {
-      return axios
-        .get(`https://pokeapi.co/api/v2/pokemon/${pokemon.id}/`)
-        .then((response) => {
-          pokemon.types = response.data.types;
-          pokemon.abilities = response.data.abilities;
-          pokemon.sprites = response.data.sprites.other.dream_world;
-        });
-    });
-
-    Promise.all(promises).then(() => {
-      setPokeData(pokemonList);
-    });
+    setPokeData(pokemonList);
+    setFilteredData(pokemonList);
   };
 
   useEffect(() => {
     pokeFun();
   }, []);
 
-  useEffect(() => {
-    setPokeShow(pokeData);
-  }, [pokeData]);
+  // useEffect(() => {
+  //   setFilteredData(pokeData);
+  // }, [pokeData]);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
 
     const filtered = pokeData.filter((pokemon: Pokemon) => {
-      return pokemon.name.toLowerCase().includes(event.target.value.toLowerCase());
+      return pokemon.name
+        .toLowerCase()
+        .includes(event.target.value.toLowerCase());
     });
 
-    setPokeShow(filtered);
+    setFilteredData(filtered);
+    console.log(filtered);
   };
 
   const columns = [
@@ -148,17 +146,13 @@ const PokemonTable: React.FC = () => {
   ) : (
     <div className="container">
       <div className="search-container">
-        <Space direction="horizontal" style={{width: 350}}>
+        <Space direction="horizontal" style={{ width: 350 }}>
           <Text>Search:</Text>
-          <Search placeholder="Search..." onChange={handleInputChange}></Search>
+          <Search placeholder="Search..." onChange={handleSearch}></Search>
         </Space>
-        {/* <Input
-          type="text"
-          onChange={handleInputChange}
-        ></Input> */}
         <p>{searchValue}</p>
       </div>
-      <Table dataSource={pokeShow} columns={columns} />
+      <Table dataSource={filteredData} columns={columns} pagination={{pageSize: 20}} />
     </div>
   );
 };

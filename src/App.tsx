@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import PokemonTable from "./components/PokemonTable";
+import PokemonTable from "./components/PokemonTable3";
 import Navbar from "./components/Navbar";
 
 function App() {

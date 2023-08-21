@@ -1,3 +1,8 @@
+export interface Results {
+  name: string;
+  url: string;
+}
+
 export interface Pokemon {
   id: number;
   name: string;
@@ -31,3 +36,7 @@ export interface Dream_world {
   front_default: string;
   front_female: string | null;
 } 
+
+export interface typeColorInterface {
+  [key: string]: string;
+}
