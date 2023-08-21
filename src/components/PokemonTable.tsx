@@ -35,8 +35,6 @@ const PokemonTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [nextUrl, setNextUrl] = useState<string>("");
   const [prevUrl, setPrevUrl] = useState<string>("");
-  const [totalData, setTotalData] = useState<number>(0);
-  const [offset, setOffset] = useState<number>(0);
 
   const pokeFun = async () => {
     setLoading(true);
@@ -44,7 +42,6 @@ const PokemonTable: React.FC = () => {
       const res = await axios.get(url);
       setNextUrl(res.data.next);
       setPrevUrl(res.data.previous);
-      setTotalData(res.data.count);
       getPokemon(res.data.results);
       console.log("Fetch !!!");
     } catch (error) {
@@ -114,8 +111,8 @@ const PokemonTable: React.FC = () => {
       dataIndex: "types",
       key: "types",
       render: (types: Types[]) =>
-        types.map((type) => {
-          return <Tag color={type_color[type.type.name]}>{type.type.name}</Tag>;
+        types.map((type, index) => {
+          return <Tag key={index} color={type_color[type.type.name]}>{type.type.name}</Tag>;
         }),
     },
     {
