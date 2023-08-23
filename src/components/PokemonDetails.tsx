@@ -90,9 +90,9 @@ const PokemonDetails: React.FC = () => {
               <p>ID: {pokemon.id}</p>
               <p>
                 Type:{" "}
-                {pokemon.types.map((types) => {
+                {pokemon.types.map((types, index) => {
                   let color: string = types.type.name;
-                  return <Tag color={type_color[color]}>{types.type.name}</Tag>;
+                  return <Tag color={type_color[color]} key={index}>{types.type.name}</Tag>;
                 })}
               </p>
               <p>
