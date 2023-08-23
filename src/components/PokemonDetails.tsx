@@ -20,6 +20,11 @@ const PokemonDetails: React.FC = () => {
   const [pokemon, setPokemon] = React.useState<Pokemon | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // const location = useLocation();
+  // const { state } = useLocation();
+
+  // setPokemon(state);
+
   useEffect(() => {
     axios
       .get(`https://pokeapi.co/api/v2/pokemon/${id}`)
@@ -32,13 +37,6 @@ const PokemonDetails: React.FC = () => {
         const types = data.types.map((type: Types) => ({
           type: { name: type.type.name },
         }));
-
-        // const types = data.types.map((type: Types) => {
-        //   let type1: Species = type.type;
-        //   ({
-        //     type: type1.name,
-        //   });
-        // });
 
         const pokemonDetails: Pokemon = {
           id: data.id,
@@ -106,6 +104,7 @@ const PokemonDetails: React.FC = () => {
             </div>
           </Card>
         </div>
+
       </div>
     </>
   );

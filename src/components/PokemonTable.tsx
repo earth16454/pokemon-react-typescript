@@ -10,7 +10,9 @@ import {
   Typography,
   Layout,
   Pagination,
+  Select,
 } from "antd";
+import type { PaginationProps } from "antd";
 import axios from "axios";
 import { SearchOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -27,23 +29,27 @@ import "./detail.css";
 import Search from "antd/es/input/Search";
 
 const { Text } = Typography;
+const { Option } = Select;
 
 const PokemonTable: React.FC = () => {
-  const [pokeData, setPokeData] = useState<Pokemon[]>([]);
+  // const [allPokemonData, setAllPokemonData] = useState<Pokemon[]>([]);
+  const [pokeDataAll, setPokeDataAll] = useState<Pokemon[]>([]);
+  // const [pokeData, setPokeData] = useState<Pokemon[]>([]);
   const [filteredData, setFilteredData] = useState<Pokemon[]>([]);
-  const [url, setUrl] = useState("https://pokeapi.co/api/v2/pokemon/");
-  const [loading, setLoading] = useState<boolean>(true);
-  const [nextUrl, setNextUrl] = useState<string>("");
-  const [prevUrl, setPrevUrl] = useState<string>("");
+  const [url, setUrl] = useState<string>(`https://pokeapi.co/api/v2/pokemon/`);
 
-  const pokeFun = async () => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [count, setCount] = useState<number>(0);
+
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const fetchPokemonData = async () => {
     setLoading(true);
     try {
       const res = await axios.get(url);
-      setNextUrl(res.data.next);
-      setPrevUrl(res.data.previous);
+      setCount(res.data.count);
       getPokemon(res.data.results);
-      console.log("Fetch !!!");
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -66,26 +72,77 @@ const PokemonTable: React.FC = () => {
       };
     });
 
-    setPokeData(pokemonList);
-    setFilteredData(pokemonList);
+    const newPokemonList: Pokemon[] = pokemonList.filter((newPokemon) => {
+      return !pokeDataAll.some(
+        (existingPokemon) => existingPokemon.id === newPokemon.id
+      );
+    });
+
+    const updatedPokemonSet = new Set([...pokeDataAll, ...newPokemonList]);
+    const updatedPokemonArray = Array.from(updatedPokemonSet);
+    setPokeDataAll(updatedPokemonArray);
+
+    // setPokeData(pokemonList);
+    setFilteredData(pokemonList); //
   };
 
   useEffect(() => {
-    pokeFun();
+    fetchPokemonData();
   }, [url]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
 
-    const filtered = pokeData.filter((pokemon: Pokemon) => {
+    const filtered = pokeDataAll.filter((pokemon: Pokemon) => {
       return pokemon.name
         .toLowerCase()
         .includes(event.target.value.toLowerCase());
     });
 
     setFilteredData(filtered);
-    console.log(filtered);
   };
+
+  const selectPageNumber = (page: number, pageSize: number) => {
+    let totalRecordOnPage: number = page * pageSize; // limit
+    let limitPage: number = pageSize;
+    let offsetPage: number = totalRecordOnPage - pageSize; // offset
+    setCurrentPage(page);
+
+    let checkIdUrl: boolean = false;
+    pokeDataAll.map((pokemon) => {
+      if (!(pokemon.id > offsetPage && pokemon.id <= limitPage)) {
+        checkIdUrl = true;
+      }
+      console.log(`id: ${pokemon.id}, name: ${pokemon.name}`);
+    });
+
+    checkIdUrl &&
+      setUrl(
+        `https://pokeapi.co/api/v2/pokemon/?offset=${offsetPage}&limit=${limitPage}`
+      );
+
+    console.log(
+      `page: ${page}, pageSize: ${pageSize}, Limit: ${limitPage}, offset: ${offsetPage}, last record: ${totalRecordOnPage}`
+    );
+    console.log("Poke data all:", pokeDataAll);
+  };
+
+  const selectPageSize = (current: number, size: number) => {
+    setPokeDataAll([]);
+    setFilteredData([]);
+    setPageSize(size);
+
+    let totalRecordOnPage: number = current * size; // last record in page
+    let offsetPage: number = totalRecordOnPage - size; // offset
+
+    setUrl(
+      `https://pokeapi.co/api/v2/pokemon/?offset=${offsetPage}&limit=${size}`
+    );
+
+    setCurrentPage(1);
+  };
+
+  const selectType = () => {};
 
   const columns = [
     {
@@ -112,7 +169,11 @@ const PokemonTable: React.FC = () => {
       key: "types",
       render: (types: Types[]) =>
         types.map((type, index) => {
-          return <Tag key={index} color={type_color[type.type.name]}>{type.type.name}</Tag>;
+          return (
+            <Tag key={index} color={type_color[type.type.name]}>
+              {type.type.name}
+            </Tag>
+          );
         }),
     },
     {
@@ -126,25 +187,24 @@ const PokemonTable: React.FC = () => {
       title: "View",
       key: "view",
       render: (text: string, record: Pokemon) => (
-        <Link to={`details/${record.id}`} key={record.id}>
+        <Link
+          to={`details/${record.id}`}
+          state={{ pokemon: record }}
+          key={record.id}
+        >
           <Button icon={<SearchOutlined />}>View Details</Button>
         </Link>
       ),
     },
   ];
 
-  return loading ? (
-    <>
-      <div className="loading">
-        <Spin spinning={loading} className="spin-loading" size="large"></Spin>
-      </div>
-    </>
-  ) : (
+  return (
     <div className="container" style={{ marginBottom: 50 }}>
       <div className="search-container">
-        <Space direction="horizontal" style={{ width: 350 }}>
+        <Space direction="horizontal" style={{ width: 400 }}>
           <Text>Search:</Text>
           <Search placeholder="Search..." onChange={handleSearch}></Search>
+          <Text>ข้อมูลปัจจุบัน : {pokeDataAll.length}</Text>
         </Space>
       </div>
       <Table
@@ -152,34 +212,16 @@ const PokemonTable: React.FC = () => {
         columns={columns}
         loading={loading}
         rowKey={(record) => record.id.toString()}
-        pagination={false}
+        pagination={{
+          current: currentPage,
+          total: count,
+          pageSizeOptions: ["10", "20", "30", "50", "80", "100"],
+          defaultPageSize: 10,
+          position: ["topRight"],
+          onChange: selectPageNumber,
+          onShowSizeChange: selectPageSize,
+        }}
       />
-      <Space style={{ marginTop: 16 }}>
-        {prevUrl === null ? (
-          <Button disabled>Previous</Button>
-        ) : (
-          <Button
-            onClick={() => {
-              setPokeData([]);
-              setUrl(prevUrl);
-            }}
-          >
-            Previous
-          </Button>
-        )}
-        {nextUrl === null ? (
-          <Button disabled>Next</Button>
-        ) : (
-          <Button
-            onClick={() => {
-              setPokeData([]);
-              setUrl(nextUrl);
-            }}
-          >
-            Next
-          </Button>
-        )}
-      </Space>
     </div>
   );
 };
@@ -202,6 +244,7 @@ const type_color: typeColorInterface = {
   dark: "#705848",
   steel: "#b8b8d0",
   fairy: "#e989e8",
+  psychic: "#ff227a",
 };
 
 export default PokemonTable;
