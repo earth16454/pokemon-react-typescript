@@ -7,6 +7,7 @@ import {
   Input,
   Space,
   Typography,
+  Select,
 } from "antd";
 import type { PaginationProps } from "antd";
 import axios from "axios";
@@ -23,21 +24,33 @@ import "./detail.css";
 
 const { Text } = Typography;
 const { Search } = Input;
+const { Option } = Select;
+
+interface TypesAPI {
+  name: string;
+  pokemon: { pokemon: Results; slot: number }[];
+}
 
 const PokemonTable: React.FC = () => {
   const [pokeDataAll, setPokeDataAll] = useState<Pokemon[]>([]);
   const [filteredData, setFilteredData] = useState<Pokemon[]>([]);
   const [url, setUrl] = useState<string>(`https://pokeapi.co/api/v2/pokemon/`);
+  const [countPokemon, setCountPokemon] = useState<number>(0);
+
+  const [pokeTypes, setPokeTypes] = useState<TypesAPI[]>([]);
+  const [TypesUrl, setTypesUrl] = useState<string>(
+    `https://pokeapi.co/api/v2/type/`
+  );
+  const [countTypes, setCountTypes] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [count, setCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const fetchPokemonData = async () => {
     setLoading(true);
     try {
       const res = await axios.get(url);
-      setCount(res.data.count);
+      setCountPokemon(res.data.count);
       getPokemon(res.data.results);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -74,9 +87,41 @@ const PokemonTable: React.FC = () => {
     setFilteredData(pokemonList);
   };
 
+  const getTypes = async (response: Results[]) => {
+    const typesResponses = await Promise.all(
+      response.map((result: Results) => axios.get(result.url))
+    );
+
+    const pokemonTypeList: TypesAPI[] = typesResponses.map((response: any) => {
+      const data = response.data;
+      return {
+        name: data.name,
+        pokemon: data.pokemon,
+      };
+    });
+
+    setPokeTypes(pokemonTypeList);
+  };
+
+  const fetchPokemonTpyes = async () => {
+    setLoading(true);
+    try {
+      const resTypes = await axios.get(TypesUrl);
+      setCountTypes(resTypes.data.count);
+      getTypes(resTypes.data.results);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     fetchPokemonData();
   }, [url]);
+
+  useEffect(() => {
+    fetchPokemonTpyes();
+  }, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
@@ -128,6 +173,8 @@ const PokemonTable: React.FC = () => {
 
     setCurrentPage(1);
   };
+
+  const selectType = () => {};
 
   const columns = [
     {
@@ -191,6 +238,25 @@ const PokemonTable: React.FC = () => {
           <Search placeholder="Search..." onChange={handleSearch}></Search>
           <Text>ข้อมูลปัจจุบัน : {pokeDataAll.length}</Text>
         </Space>
+        <Space>
+          <Text>Type: </Text>
+          <Select
+            mode="multiple"
+            style={{ width: 400 }}
+            placeholder="Select type"
+            onChange={selectType}
+          >
+            {pokeTypes.map((type, index) => {
+              return (
+                <Option value={type.name} key={index}>
+                  <Tag key={index} color={type_color[type.name]}>
+                    {type.name}
+                  </Tag>
+                </Option>
+              );
+            })}
+          </Select>
+        </Space>
       </div>
       <Table
         dataSource={filteredData}
@@ -199,7 +265,7 @@ const PokemonTable: React.FC = () => {
         rowKey={(record) => record.id.toString()}
         pagination={{
           current: currentPage,
-          total: count,
+          total: countPokemon,
           pageSizeOptions: ["10", "20", "30", "50", "80", "100"],
           defaultPageSize: 10,
           position: ["topRight"],
@@ -230,6 +296,7 @@ const type_color: typeColorInterface = {
   steel: "#b8b8d0",
   fairy: "#e989e8",
   psychic: "#ff227a",
+  shadow: "#c5c5c5",
 };
 
 export default PokemonTable;
