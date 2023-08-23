@@ -5,12 +5,8 @@ import {
   Image,
   Tag,
   Input,
-  Spin,
   Space,
   Typography,
-  Layout,
-  Pagination,
-  Select,
 } from "antd";
 import type { PaginationProps } from "antd";
 import axios from "axios";
@@ -19,29 +15,22 @@ import { Link } from "react-router-dom";
 import {
   Results,
   Pokemon,
-  Species,
   Types,
-  Ability,
   Dream_world,
   typeColorInterface,
 } from "./interface";
 import "./detail.css";
-import Search from "antd/es/input/Search";
 
 const { Text } = Typography;
-const { Option } = Select;
+const { Search } = Input;
 
 const PokemonTable: React.FC = () => {
-  // const [allPokemonData, setAllPokemonData] = useState<Pokemon[]>([]);
   const [pokeDataAll, setPokeDataAll] = useState<Pokemon[]>([]);
-  // const [pokeData, setPokeData] = useState<Pokemon[]>([]);
   const [filteredData, setFilteredData] = useState<Pokemon[]>([]);
   const [url, setUrl] = useState<string>(`https://pokeapi.co/api/v2/pokemon/`);
 
   const [loading, setLoading] = useState<boolean>(true);
   const [count, setCount] = useState<number>(0);
-
-  const [pageSize, setPageSize] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const fetchPokemonData = async () => {
@@ -80,10 +69,9 @@ const PokemonTable: React.FC = () => {
 
     const updatedPokemonSet = new Set([...pokeDataAll, ...newPokemonList]);
     const updatedPokemonArray = Array.from(updatedPokemonSet);
-    setPokeDataAll(updatedPokemonArray);
 
-    // setPokeData(pokemonList);
-    setFilteredData(pokemonList); //
+    setPokeDataAll(updatedPokemonArray);
+    setFilteredData(pokemonList);
   };
 
   useEffect(() => {
@@ -130,7 +118,6 @@ const PokemonTable: React.FC = () => {
   const selectPageSize = (current: number, size: number) => {
     setPokeDataAll([]);
     setFilteredData([]);
-    setPageSize(size);
 
     let totalRecordOnPage: number = current * size; // last record in page
     let offsetPage: number = totalRecordOnPage - size; // offset
@@ -141,8 +128,6 @@ const PokemonTable: React.FC = () => {
 
     setCurrentPage(1);
   };
-
-  const selectType = () => {};
 
   const columns = [
     {
