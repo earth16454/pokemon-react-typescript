@@ -126,12 +126,32 @@ const PokemonTable: React.FC = () => {
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
 
-    const filtered = pokeDataAll.filter((pokemon: Pokemon) => {
+    let filtered = pokeDataAll.filter((pokemon: Pokemon) => {
       return pokemon.name
         .toLowerCase()
         .includes(event.target.value.toLowerCase());
     });
 
+    setFilteredData(filtered);
+  };
+
+  const handleSelectType = (values: string) => {
+    setFilteredData(pokeDataAll);
+    let filtered = pokeDataAll.filter((pokemon: Pokemon) => {
+      let resultSelectType = pokemon.types.filter((types: Types) => {
+        // let result = values.map((value: string) => {
+        //   return types.type.name.includes(value);
+        // })
+        // return result;
+        return types.type.name.includes(values);
+      });
+      if (resultSelectType.length != 0) {
+        return resultSelectType;
+      }
+
+    });
+    console.log(filtered);
+    
     setFilteredData(filtered);
   };
 
@@ -173,8 +193,6 @@ const PokemonTable: React.FC = () => {
 
     setCurrentPage(1);
   };
-
-  const selectType = () => {};
 
   const columns = [
     {
@@ -244,7 +262,7 @@ const PokemonTable: React.FC = () => {
             mode="multiple"
             style={{ width: 400 }}
             placeholder="Select type"
-            onChange={selectType}
+            onChange={handleSelectType}
           >
             {pokeTypes.map((type, index) => {
               return (
