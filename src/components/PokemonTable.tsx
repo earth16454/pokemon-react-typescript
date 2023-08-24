@@ -1,25 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  Image,
-  Tag,
-  Input,
-  Space,
-  Typography,
-  Select,
-} from "antd";
+import { Table, Button, Image, Tag, Input, Space, Typography, Select } from "antd";
 import type { PaginationProps } from "antd";
 import axios from "axios";
 import { SearchOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import {
-  Results,
-  Pokemon,
-  Types,
-  Dream_world,
-  typeColorInterface,
-} from "./interface";
+import { Results, Pokemon, Types, Dream_world, typeColorInterface } from "./interface";
 import "./detail.css";
 
 const { Text } = Typography;
@@ -39,10 +24,10 @@ const PokemonTable: React.FC = () => {
   const [countPokemon, setCountPokemon] = useState<number>(0);
 
   const [pokeTypes, setPokeTypes] = useState<TypesAPI[]>([]);
-  const [TypesUrl, setTypesUrl] = useState<string>(
-    `https://pokeapi.co/api/v2/type/`
-  );
+  const [TypesUrl, setTypesUrl] = useState<string>(`https://pokeapi.co/api/v2/type/`);
   const [countTypes, setCountTypes] = useState<number>(0);
+
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -60,9 +45,7 @@ const PokemonTable: React.FC = () => {
   };
 
   const getPokemon = async (response: Results[]) => {
-    const pokemonResponses = await Promise.all(
-      response.map((result: Results) => axios.get(result.url))
-    );
+    const pokemonResponses = await Promise.all(response.map((result: Results) => axios.get(result.url)));
 
     const pokemonList: Pokemon[] = pokemonResponses.map((response: any) => {
       const data = response.data;
@@ -76,9 +59,7 @@ const PokemonTable: React.FC = () => {
     });
 
     const newPokemonList: Pokemon[] = pokemonList.filter((newPokemon) => {
-      return !pokeDataAll.some(
-        (existingPokemon) => existingPokemon.id === newPokemon.id
-      );
+      return !pokeDataAll.some((existingPokemon) => existingPokemon.id === newPokemon.id);
     });
 
     const updatedPokemonSet = new Set([...pokeDataAll, ...newPokemonList]);
@@ -89,9 +70,7 @@ const PokemonTable: React.FC = () => {
   };
 
   const getTypes = async (response: Results[]) => {
-    const typesResponses = await Promise.all(
-      response.map((result: Results) => axios.get(result.url))
-    );
+    const typesResponses = await Promise.all(response.map((result: Results) => axios.get(result.url)));
 
     const pokemonTypeList: TypesAPI[] = typesResponses.map((response: any) => {
       const data = response.data;
@@ -125,43 +104,32 @@ const PokemonTable: React.FC = () => {
   }, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
+    const searchText = event.target.value.toLowerCase();
+
     let filtered = pokeDataAll.filter((pokemon: Pokemon) => {
-      return pokemon.name
-        .toLowerCase()
-        .includes(event.target.value.toLowerCase());
+      const nameMatch = pokemon.name.toLowerCase().includes(searchText);
+
+      if (nameMatch && selectedTypes.length > 0) {
+        const typeMatch = pokemon.types.some((type) => selectedTypes.includes(type.type.name));
+        return typeMatch;
+      }
+
+      return nameMatch;
     });
 
     setFilteredData(filtered);
   };
 
   const handleSelectType = (values: string[]) => {
-    // Complete 1
-
+    setSelectedTypes(values);
     let filtered = pokeDataAll.filter((pokemon: Pokemon) => {
-      let resultSelectType = pokemon.types.filter((types: Types) => {
-        let result = values.filter((value: string) => {
-          return types.type.name.includes(value);
-        });
-        if (result.length != 0) {
-          return result;
-        }
-
-        // return types.type.name.includes(values);
-      });
-      // console.log("resultSelectType:",resultSelectType);
-
-      if (resultSelectType.length != 0) {
-        console.log("Pokemon Type:", resultSelectType);
-        return resultSelectType;
+      if (values.length === 0) {
+        return true;
       }
+      const resultSelectType = pokemon.types.some((type: Types) => values.includes(type.type.name));
+      return resultSelectType;
     });
-    console.log("Pokemon:", filtered);
-    if (values.length != 0) {
-      setFilteredData(filtered);
-    } else {
-      setFilteredData(pokeDataAll);
-    }
+    setFilteredData(filtered);
   };
 
   const selectPageNumber = (page: number, pageSize: number) => {
@@ -177,24 +145,15 @@ const PokemonTable: React.FC = () => {
       }
       // console.log(`id: ${pokemon.id}, name: ${pokemon.name}`);
     });
-
-    checkIdUrl &&
-      setUrl(
-        `https://pokeapi.co/api/v2/pokemon/?offset=${offsetPage}&limit=${limitPage}`
-      );
+    checkIdUrl && setUrl(`https://pokeapi.co/api/v2/pokemon/?offset=${offsetPage}&limit=${limitPage}`);
   };
 
   const selectPageSize = (current: number, size: number) => {
     setPokeDataAll([]);
     setFilteredData([]);
-
     let totalRecordOnPage: number = current * size; // last record in page
     let offsetPage: number = totalRecordOnPage - size; // offset
-
-    setUrl(
-      `https://pokeapi.co/api/v2/pokemon/?offset=${offsetPage}&limit=${size}`
-    );
-
+    setUrl(`https://pokeapi.co/api/v2/pokemon/?offset=${offsetPage}&limit=${size}`);
     setCurrentPage(1);
   };
 
@@ -208,9 +167,7 @@ const PokemonTable: React.FC = () => {
       title: "Image",
       dataIndex: "sprites",
       key: "sprites",
-      render: (sprites: Dream_world) => (
-        <Image src={sprites.front_default} alt="Pokemon" width={50}></Image>
-      ),
+      render: (sprites: Dream_world) => <Image src={sprites.front_default} alt="Pokemon" width={50}></Image>,
     },
     {
       title: "Name",
@@ -241,11 +198,7 @@ const PokemonTable: React.FC = () => {
       title: "View",
       key: "view",
       render: (text: string, record: Pokemon) => (
-        <Link
-          to={`details/${record.id}`}
-          state={{ pokemon: record }}
-          key={record.id}
-        >
+        <Link to={`details/${record.id}`} state={{ pokemon: record }} key={record.id}>
           <Button icon={<SearchOutlined />}>View Details</Button>
         </Link>
       ),
@@ -262,12 +215,7 @@ const PokemonTable: React.FC = () => {
         </Space>
         <Space style={{ marginLeft: 16 }}>
           <Text>Type: </Text>
-          <Select
-            mode="multiple"
-            style={{ width: 400 }}
-            placeholder="Select type"
-            onChange={handleSelectType}
-          >
+          <Select mode="multiple" style={{ width: 400 }} placeholder="Select type" onChange={handleSelectType}>
             {pokeTypes.map((type, index) => {
               return (
                 <Option value={type.name} key={index}>
