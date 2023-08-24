@@ -33,6 +33,7 @@ interface TypesAPI {
 
 const PokemonTable: React.FC = () => {
   const [pokeDataAll, setPokeDataAll] = useState<Pokemon[]>([]);
+  const [pokeData, setPokeData] = useState<Pokemon[]>([]);
   const [filteredData, setFilteredData] = useState<Pokemon[]>([]);
   const [url, setUrl] = useState<string>(`https://pokeapi.co/api/v2/pokemon/`);
   const [countPokemon, setCountPokemon] = useState<number>(0);
@@ -70,7 +71,7 @@ const PokemonTable: React.FC = () => {
         name: data.name,
         types: data.types,
         abilities: data.abilities,
-        sprites: data.sprites.other.dream_world,
+        sprites: data.sprites.other.home,
       };
     });
 
@@ -125,7 +126,6 @@ const PokemonTable: React.FC = () => {
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value);
-
     let filtered = pokeDataAll.filter((pokemon: Pokemon) => {
       return pokemon.name
         .toLowerCase()
@@ -135,24 +135,33 @@ const PokemonTable: React.FC = () => {
     setFilteredData(filtered);
   };
 
-  const handleSelectType = (values: string) => {
-    setFilteredData(pokeDataAll);
+  const handleSelectType = (values: string[]) => {
+    // Complete 1
+
     let filtered = pokeDataAll.filter((pokemon: Pokemon) => {
       let resultSelectType = pokemon.types.filter((types: Types) => {
-        // let result = values.map((value: string) => {
-        //   return types.type.name.includes(value);
-        // })
-        // return result;
-        return types.type.name.includes(values);
+        let result = values.filter((value: string) => {
+          return types.type.name.includes(value);
+        });
+        if (result.length != 0) {
+          return result;
+        }
+
+        // return types.type.name.includes(values);
       });
+      // console.log("resultSelectType:",resultSelectType);
+
       if (resultSelectType.length != 0) {
+        console.log("Pokemon Type:", resultSelectType);
         return resultSelectType;
       }
-
     });
-    console.log(filtered);
-    
-    setFilteredData(filtered);
+    console.log("Pokemon:", filtered);
+    if (values.length != 0) {
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(pokeDataAll);
+    }
   };
 
   const selectPageNumber = (page: number, pageSize: number) => {
@@ -166,18 +175,13 @@ const PokemonTable: React.FC = () => {
       if (!(pokemon.id > offsetPage && pokemon.id <= limitPage)) {
         checkIdUrl = true;
       }
-      console.log(`id: ${pokemon.id}, name: ${pokemon.name}`);
+      // console.log(`id: ${pokemon.id}, name: ${pokemon.name}`);
     });
 
     checkIdUrl &&
       setUrl(
         `https://pokeapi.co/api/v2/pokemon/?offset=${offsetPage}&limit=${limitPage}`
       );
-
-    console.log(
-      `page: ${page}, pageSize: ${pageSize}, Limit: ${limitPage}, offset: ${offsetPage}, last record: ${totalRecordOnPage}`
-    );
-    console.log("Poke data all:", pokeDataAll);
   };
 
   const selectPageSize = (current: number, size: number) => {
@@ -256,7 +260,7 @@ const PokemonTable: React.FC = () => {
           <Search placeholder="Search..." onChange={handleSearch}></Search>
           <Text>ข้อมูลปัจจุบัน : {pokeDataAll.length}</Text>
         </Space>
-        <Space>
+        <Space style={{ marginLeft: 16 }}>
           <Text>Type: </Text>
           <Select
             mode="multiple"
@@ -274,6 +278,7 @@ const PokemonTable: React.FC = () => {
               );
             })}
           </Select>
+          <Text>{filteredData.length}</Text>
         </Space>
       </div>
       <Table

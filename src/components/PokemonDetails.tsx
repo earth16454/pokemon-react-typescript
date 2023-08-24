@@ -43,7 +43,7 @@ const PokemonDetails: React.FC = () => {
           name: data.name,
           types: types,
           abilities: abilities,
-          sprites: data.sprites.other.dream_world,
+          sprites: data.sprites.other.home,
         };
         setPokemon(pokemonDetails);
         setLoading(false);
