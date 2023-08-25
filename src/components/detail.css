@@ -5,8 +5,6 @@
 
 .table-pokemon .ant-table {
   background-color: rgba(255, 255, 255, 0.325);
-  /* border-radius: 16px; */
-
 }
 
 .table-pokemon .ant-table thead .ant-table-cell {
@@ -96,16 +94,6 @@
   border-color: rgba(255, 255, 255, 0.75);
   background-color: rgba(255, 255, 255, 0.5);
 }
-
-.select-page .ant-pagination-options .ant-selectant-pagination-options-size-changer:hover,
-.select-page .ant-pagination-options .ant-select:focus {
-  border-color: red;
-}
-
-.ant-select.ant-pagination-options-size-changer.css-dev-only-do-not-override-byeoj0.ant-select-single.ant-select-show-arrow.ant-select-show-search:hover {
-  /* border-color: red; */
-}
-
 /* End select page  */
 
 /* Table Empty */
@@ -177,17 +165,9 @@
 .btn-back:active,
 .btn-back:focus {
   color: rgba(0, 0, 0, 0.8);
-  /* border-color: rgba(255, 255, 255, 0.5); */
-  /* border-color: rgba(2, 84, 100, 0.5); */
   border-color: rgba(0, 0, 0, 0.5);
-  /* background-color: rgba(2, 84, 100, 0.5); */
-  /* background-color: rgba(2, 84, 100, 0.3); */
   background-color: rgba(0, 0, 0, 0.1);
 }
-
-/* .back-link .btn-back .span.anticon.anticon-left {
-
-} */
 
 .back-link .btn-back span.btn-text {
   width: 100%;
