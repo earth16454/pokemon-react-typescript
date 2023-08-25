@@ -9,6 +9,7 @@ export interface Pokemon {
   types: Types[];
   abilities: Ability[];
   sprites: Sprites;
+  stats: Stats[];
 }
 
 export interface Species {
@@ -37,6 +38,52 @@ export interface Dream_world {
   front_female: string | null;
 } 
 
+export interface Stats {
+  base_stat: number;
+  effort: number;
+  stat: {name: string, url: string};
+}
+
+export interface Hp {
+  base_stat: number;
+  effort: number;
+  name: string;
+}
+
+export interface Attack {
+  base_stat: number;
+  effort: number;
+  name: string;
+}
+
+export interface Defense {
+  base_stat: number;
+  effort: number;
+  name: string;
+}
+
+export interface SpecialAttack {
+  base_stat: number;
+  effort: number;
+  name: string;
+}
+
+export interface SpecialDefense {
+  base_stat: number;
+  effort: number;
+  name: string;
+}
+
+export interface Speed {
+  base_stat: number;
+  effort: number;
+  name: string;
+}
+
 export interface typeColorInterface {
+  [key: string]: string;
+}
+
+export interface LogoTypes {
   [key: string]: string;
 }

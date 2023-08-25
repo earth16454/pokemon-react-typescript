@@ -1,5 +1,23 @@
 body {
-  background-color: rgba(252, 238, 200, 0.2);
+  /* background-color: rgba(252, 238, 200, 0.2); */
+  background-image: linear-gradient(
+    to right top,
+    #025464,
+    #006775,
+    #007b83,
+    #008f8f,
+    #00a498,
+    #3ab299,
+    #5bc09a,
+    #79cd9b,
+    #a4d7a1,
+    #c8e1ad,
+    #e7ebbf,
+    #fff7d6
+  );
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 100vh;
 }
 img,
 svg {
@@ -70,4 +88,17 @@ svg {
 }
 .text-center {
   text-align: center !important;
+}
+
+.shadow {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.pokemon-brand {
+  text-align: center;
+  color: #014856;
 }

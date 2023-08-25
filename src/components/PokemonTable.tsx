@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Image, Tag, Input, Space, Typography, Select } from "antd";
+import { Table, Button, Image, Tag, Input, Space, Typography, Select, Empty } from "antd";
 import type { PaginationProps } from "antd";
 import axios from "axios";
 import { SearchOutlined } from "@ant-design/icons";
+import type { CustomTagProps } from "rc-select/lib/BaseSelect";
 import { Link } from "react-router-dom";
 import { Results, Pokemon, Types, Dream_world, typeColorInterface } from "./interface";
 import "./detail.css";
@@ -55,6 +56,7 @@ const PokemonTable: React.FC = () => {
         types: data.types,
         abilities: data.abilities,
         sprites: data.sprites.other.home,
+        stats: data.stats,
       };
     });
 
@@ -206,7 +208,7 @@ const PokemonTable: React.FC = () => {
   ];
 
   return (
-    <div className="container" style={{ marginBottom: 50 }}>
+    <div className="container" style={{ marginBottom: 100 }}>
       <div className="search-container">
         <Space direction="horizontal" style={{ width: 400 }}>
           <Text>Search:</Text>
@@ -215,10 +217,18 @@ const PokemonTable: React.FC = () => {
         </Space>
         <Space style={{ marginLeft: 16 }}>
           <Text>Type: </Text>
-          <Select mode="multiple" style={{ width: 400 }} placeholder="Select type" onChange={handleSelectType}>
+          <Select
+            tagRender={tagRender} 
+            mode="multiple"
+            className="select-type"
+            style={{ width: 400 }}
+            placeholder="Select type"
+            onChange={handleSelectType}
+            optionLabelProp="label"
+          >
             {pokeTypes.map((type, index) => {
               return (
-                <Option value={type.name} key={index}>
+                <Option className="select-type-option" value={type.name} label={type.name} key={index}>
                   <Tag key={index} color={type_color[type.name]}>
                     {type.name}
                   </Tag>
@@ -230,14 +240,17 @@ const PokemonTable: React.FC = () => {
         </Space>
       </div>
       <Table
+        className="table-pokemon"
+        locale={{emptyText: <Empty/>}}
         dataSource={filteredData}
         columns={columns}
         loading={loading}
         rowKey={(record) => record.id.toString()}
         pagination={{
+          className: "select-page",
           current: currentPage,
           total: countPokemon,
-          pageSizeOptions: ["10", "20", "30", "50", "80", "100"],
+          pageSizeOptions: ["10", "20", "30", "50", "80", "100", "500"],
           defaultPageSize: 10,
           position: ["topRight"],
           onChange: selectPageNumber,
@@ -268,6 +281,32 @@ const type_color: typeColorInterface = {
   fairy: "#e989e8",
   psychic: "#ff227a",
   shadow: "#c5c5c5",
+};
+
+// const options = [
+//   {}
+// ]
+
+const tagRender = (props: CustomTagProps) => {
+  const { label, value, closable, onClose } = props;
+  const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  // console.log(label, closable, onClose);
+  console.log("value:",value);
+  
+  
+
+  return (
+    <Tag
+      color={type_color[value]}
+      onMouseDown={onPreventMouseDown}
+      closable={closable}
+      onClose={onClose}
+      style={{ marginRight: 3 }}
+    >{label}</Tag>
+  );
 };
 
 export default PokemonTable;

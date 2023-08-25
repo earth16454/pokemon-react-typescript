@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons";
 import Navbar from "./Navbar";
-import { Spin, Image, Tag, Card, Divider, Button } from "antd";
+import { Spin, Image, Tag, Card, Divider, Button, Typography, Row, Col, Progress, Space } from "antd";
 import {
   Pokemon,
   Ability,
@@ -12,18 +12,63 @@ import {
   Sprites,
   Dream_world,
   typeColorInterface,
+  Stats,
+  Hp,
+  Attack,
+  Defense,
+  SpecialAttack,
+  SpecialDefense,
+  Speed,
+  LogoTypes,
 } from "./interface";
 import "./detail.css";
+import bug from "./assets/icons/bug.svg";
+import dark from "./assets/icons/dark.svg";
+import dragon from "./assets/icons/dragon.svg";
+import electric from "./assets/icons/electric.svg";
+import fairy from "./assets/icons/fairy.svg";
+import fighting from "./assets/icons/fighting.svg";
+import fire from "./assets/icons/fire.svg";
+import flying from "./assets/icons/flying.svg";
+import ghost from "./assets/icons/ghost.svg";
+import grass from "./assets/icons/grass.svg";
+import ground from "./assets/icons/ground.svg";
+import ice from "./assets/icons/ice.svg";
+import normal from "./assets/icons/normal.svg";
+import poison from "./assets/icons/poison.svg";
+import psychic from "./assets/icons/psychic.svg";
+import rock from "./assets/icons/rock.svg";
+import steel from "./assets/icons/steel.svg";
+import water from "./assets/icons/water.svg";
+
+const logo_types: LogoTypes = {
+  bug: bug,
+  dark: dark,
+  dragon: dragon,
+  electric: electric,
+  fairy: fairy,
+  fighting: fighting,
+  fire: fire,
+  flying: flying,
+  ghost: ghost,
+  grass: grass,
+  ground: ground,
+  ice: ice,
+  normal: normal,
+  poison: poison,
+  psychic: psychic,
+  rock: rock,
+  steel: steel,
+  water: water,
+};
+
+const { Text, Title } = Typography;
+const { Meta } = Card;
 
 const PokemonDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [pokemon, setPokemon] = React.useState<Pokemon | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
-  // const location = useLocation();
-  // const { state } = useLocation();
-
-  // setPokemon(state);
 
   useEffect(() => {
     axios
@@ -44,6 +89,7 @@ const PokemonDetails: React.FC = () => {
           types: types,
           abilities: abilities,
           sprites: data.sprites.other.home,
+          stats: data.stats,
         };
         setPokemon(pokemonDetails);
         setLoading(false);
@@ -74,37 +120,79 @@ const PokemonDetails: React.FC = () => {
       <div className="container">
         <div className="back-link">
           <Link to={"/"}>
-            <Button icon={<ArrowLeftOutlined />} className="btn-back">
-              Back
-            </Button>
+            <button className="btn-back">
+              <LeftOutlined />
+              <span className="btn-text">Back</span>
+            </button>
           </Link>
         </div>
-        <div className="content">
-          <Card style={cardStyle}>
-            <div className="pokemon-img">
-              <Image width={200} src={pokemon.sprites.front_default}></Image>
-            </div>
-            <Divider />
-            <h2>{pokemon.name}</h2>
-            <div className="pokemon-detail">
-              <p>ID: {pokemon.id}</p>
-              <p>
-                Type:{" "}
-                {pokemon.types.map((types, index) => {
-                  let color: string = types.type.name;
-                  return <Tag color={type_color[color]} key={index}>{types.type.name}</Tag>;
-                })}
-              </p>
-              <p>
-                Abilities:{" "}
-                {pokemon.abilities
-                  .map((ability) => ability.ability.name)
-                  .join(", ")}
-              </p>
-            </div>
-          </Card>
-        </div>
 
+        <Row gutter={[24, 0]} align="middle">
+          <Col span={12}>
+            <Card style={cardStyle} loading={loading} className="card-pokemon">
+              <Title style={{ margin: 0 }}>
+                #{pokemon.id} {pokemon.name}
+              </Title>
+              <Title level={3}>Base Stats</Title>
+              <Row gutter={[16, { sm: 4, md: 6, xl: 10 }]}>
+                {pokemon.stats.map((stats: Stats) => {
+                  return (
+                    <>
+                      <Col span={8}>
+                        <Text style={{ margin: 0, fontSize: 16 }}>{stats.stat.name.toUpperCase()}</Text>
+                      </Col>
+                      <Col span={1}>:</Col>
+                      <Col span={15}>
+                        <Row gutter={[24, 0]}>
+                          <Col span={20}>
+                            <Progress percent={stats.base_stat / 2} size={["100%", 16]} showInfo={false} />
+                          </Col>
+                          <Col span={4}>
+                            <Text className="stat-base">{stats.base_stat}</Text>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </>
+                  );
+                })}
+              </Row>
+              <div className="container-type">
+                {pokemon.types.map((types: Types) => {
+                  return (
+                    <>
+                      <Card
+                        className="card-type"
+                        style={{
+                          backgroundColor: type_color[types.type.name],
+                          borderColor: type_color[types.type.name],
+                        }}
+                        bodyStyle={{ padding: "12px 18px" }}
+                      >
+                        <span>
+                          <img
+                            src={logo_types[`${types.type.name}`]}
+                            width={28}
+                            alt={`Type logo: ${logo_types[`${types.type.name}`]}`}
+                          />
+                        </span>
+                        <span style={{ marginLeft: 3 }}>{pokemon.types[0].type.name}</span>
+                      </Card>
+                    </>
+                  );
+                })}
+              </div>
+              <div className="container-station">
+                <button className="btn-previous">Previous</button>
+                <button className="btn-next">Next</button>
+              </div>
+            </Card>
+          </Col>
+
+          <Col span={12} style={{ textAlign: "center" }}>
+            <Image src={pokemon.sprites.front_default} className="img-pokemon"></Image>
+            <div className="img-shadow"></div>
+          </Col>
+        </Row>
       </div>
     </>
   );
@@ -130,10 +218,12 @@ const type_color: typeColorInterface = {
   fairy: "#e989e8",
 };
 
-const cardStyle = {
-  width: "360px",
+const cardStyle: React.CSSProperties = {
+  padding: "1rem",
+  width: "100%",
+  maxWidth: "40vw",
   borderRadius: "12px",
-  boxShadow: "0 0.5rem 1rem rgba(0, 21, 41, 0.3",
+  boxShadow: "0 0.5rem 1rem rgba(0, 21, 41, 0.2",
 };
 
 export default PokemonDetails;
