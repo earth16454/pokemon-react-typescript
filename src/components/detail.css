@@ -43,17 +43,7 @@
   color: #00bf9e !important;
 }
 
-.search-container {
-
-}
-
 /* Search Name */
-/* .search-container2 {
-  display: flex;
-  width: 100%;
-  margin: 1rem 0;
-} */
-
 .search-container input {
   background-color: rgba(255, 255, 255, 0.5);
   border-color: rgba(255, 255, 255, 0.75);
@@ -133,11 +123,6 @@
 .select-page .ant-pagination-options .ant-select .ant-select-selector {
   border-color: rgba(255, 255, 255, 0.75);
   background-color: rgba(255, 255, 255, 0.5);
-}
-
-.select-page .ant-pagination-options .ant-select .ant-select-selector:hover,
-.select-page .ant-pagination-options .ant-select .ant-select-selector:focus {
-  /* border-color: #00bf9e !important; */
 }
 /* End select page  */
 
