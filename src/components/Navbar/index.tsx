@@ -62,14 +62,14 @@ const Navbar = () => {
     <>
       <nav className="navbar shadow-sm">
         <div className="container">
-          <NavLink to="/" className="navbar-brand"><img src={logo} width={140} alt="logo" /></NavLink>
+          <NavLink to="/" className="navbar-brand"><img src={logo} alt="logo" className="logo" /></NavLink>
           {/* <a href="" className="navbar-brand"><img src={logo} width={140} alt="logo" /></a> */}
           <ul className="navbar-nav">
             <li>
               <NavLink to="/" className="nav-link">Home</NavLink>
             </li>
             <li>
-              <NavLink to="/details/1" className="nav-link">Pokemon Profile</NavLink>
+              <NavLink to="/details/1" className="nav-link">Pokemon detail</NavLink>
             </li>
             <li>
               <NavLink to="/about" className="nav-link">About</NavLink>

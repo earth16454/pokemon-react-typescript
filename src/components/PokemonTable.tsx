@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Image, Tag, Input, Space, Typography, Select, Empty } from "antd";
+import { Table, Button, Image, Tag, Input, Space, Typography, Select, Empty, Row, Col, Breakpoint } from "antd";
 import type { PaginationProps } from "antd";
 import axios from "axios";
 import { SearchOutlined } from "@ant-design/icons";
@@ -23,11 +23,9 @@ const PokemonTable: React.FC = () => {
   const [filteredData, setFilteredData] = useState<Pokemon[]>([]);
   const [url, setUrl] = useState<string>(`https://pokeapi.co/api/v2/pokemon/`);
   const [countPokemon, setCountPokemon] = useState<number>(0);
-
   const [pokeTypes, setPokeTypes] = useState<TypesAPI[]>([]);
   const [TypesUrl, setTypesUrl] = useState<string>(`https://pokeapi.co/api/v2/type/`);
   const [countTypes, setCountTypes] = useState<number>(0);
-
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -145,9 +143,9 @@ const PokemonTable: React.FC = () => {
       if (!(pokemon.id > offsetPage && pokemon.id <= limitPage)) {
         checkIdUrl = true;
       }
-      // console.log(`id: ${pokemon.id}, name: ${pokemon.name}`);
     });
     checkIdUrl && setUrl(`https://pokeapi.co/api/v2/pokemon/?offset=${offsetPage}&limit=${limitPage}`);
+    setSelectedTypes([]);
   };
 
   const selectPageSize = (current: number, size: number) => {
@@ -195,6 +193,7 @@ const PokemonTable: React.FC = () => {
       key: "abilities",
       render: (abilities: { ability: { name: string } }[]) =>
         abilities.map((ability) => ability.ability.name).join(", "),
+        responsive: ["sm" as Breakpoint],
     },
     {
       title: "View",
@@ -209,19 +208,63 @@ const PokemonTable: React.FC = () => {
 
   return (
     <div className="container" style={{ marginBottom: 100 }}>
-      <div className="search-container">
-        <Space direction="horizontal" style={{ width: 400 }}>
+      <Row gutter={[24, 8]} align="middle" className="search-container">
+        {/* <Col xs={24} sm={12}> */}
+        <Col xs={24} sm={24} md={10} lg={8}>
+          <Row align="middle" gutter={[0, 16]}>
+            <Col xs={4} sm={5} lg={4}>
+              <Text>Search:</Text>
+            </Col>
+            <Col xs={20} sm={19} lg={20}>
+              <Search placeholder="Search..." onChange={handleSearch}></Search>
+            </Col>
+
+          </Row>
+        </Col>
+        <Col xs={0} sm={0} md={4} lg={8}></Col>
+        {/* <Col xs={24} sm={12}> */}
+        <Col xs={24} sm={24} md={10} lg={8}>
+          <Row align="middle">
+            <Col xs={4} sm={5} lg={4}>
+              <Text>Type:</Text>
+            </Col>
+            <Col xs={20} sm={19} lg={20}>
+              <Select
+                tagRender={tagRender}
+                mode="multiple"
+                className="select-type"
+                style={{ width: "100%" }}
+                placeholder="Select type"
+                onChange={handleSelectType}
+                optionLabelProp="label"
+              >
+                {pokeTypes.map((type, index) => {
+                  return (
+                    <Option className="select-type-option" value={type.name} label={type.name} key={index}>
+                      <Tag key={index} color={type_color[type.name]}>
+                        {type.name}
+                      </Tag>
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+      {/* <div className="search-container">
+        <Space direction="horizontal" className="space-search-name">
           <Text>Search:</Text>
           <Search placeholder="Search..." onChange={handleSearch}></Search>
           <Text>ข้อมูลปัจจุบัน : {pokeDataAll.length}</Text>
         </Space>
-        <Space style={{ marginLeft: 16 }}>
+        <Space style={{ marginLeft: 16 }} className="space-search-type">
           <Text>Type: </Text>
           <Select
-            tagRender={tagRender} 
+            tagRender={tagRender}
             mode="multiple"
             className="select-type"
-            style={{ width: 400 }}
+            style={{ width: "100%" }}
             placeholder="Select type"
             onChange={handleSelectType}
             optionLabelProp="label"
@@ -236,12 +279,11 @@ const PokemonTable: React.FC = () => {
               );
             })}
           </Select>
-          <Text>{filteredData.length}</Text>
         </Space>
-      </div>
+      </div> */}
       <Table
         className="table-pokemon"
-        locale={{emptyText: <Empty/>}}
+        locale={{ emptyText: <Empty /> }}
         dataSource={filteredData}
         columns={columns}
         loading={loading}
@@ -294,9 +336,7 @@ const tagRender = (props: CustomTagProps) => {
     event.stopPropagation();
   };
   // console.log(label, closable, onClose);
-  console.log("value:",value);
-  
-  
+  console.log("value:", value);
 
   return (
     <Tag
@@ -305,7 +345,9 @@ const tagRender = (props: CustomTagProps) => {
       closable={closable}
       onClose={onClose}
       style={{ marginRight: 3 }}
-    >{label}</Tag>
+    >
+      {label}
+    </Tag>
   );
 };
 

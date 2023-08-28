@@ -1,25 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { ArrowLeftOutlined, LeftOutlined } from "@ant-design/icons";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import Navbar from "./Navbar";
 import { Spin, Image, Tag, Card, Divider, Button, Typography, Row, Col, Progress, Space } from "antd";
 import {
   Pokemon,
   Ability,
   Types,
-  Species,
-  Sprites,
   Dream_world,
   typeColorInterface,
   Stats,
-  Hp,
-  Attack,
-  Defense,
-  SpecialAttack,
-  SpecialDefense,
-  Speed,
   LogoTypes,
+  StatsColorInterface,
 } from "./interface";
 import "./detail.css";
 import bug from "./assets/icons/bug.svg";
@@ -127,27 +120,43 @@ const PokemonDetails: React.FC = () => {
           </Link>
         </div>
 
-        <Row gutter={[24, 0]} align="middle">
-          <Col span={12}>
-            <Card style={cardStyle} loading={loading} className="card-pokemon">
-              <Title style={{ margin: 0 }}>
+        <Row gutter={[{ sm: 12, lg: 24 }, {xs: 24, sm: 24, md: 24, lg: 0}]} align="middle" className="pokemon-detail">
+          <Col xs={24} lg={0} xl={0} className="col-img-xs img-mode-m">
+            <div className="img-container">
+              <Image src={pokemon.sprites.front_default} className="img-pokemon"></Image>
+              <div className="img-shadow"></div>
+            </div>
+          </Col>
+          <Col xs={24} sm={24} md={24} lg={12}>
+            <Card loading={loading} className="card-pokemon">
+              <Title className="pokemon-title">
                 #{pokemon.id} {pokemon.name}
               </Title>
               <Title level={3}>Base Stats</Title>
-              <Row gutter={[16, { sm: 4, md: 6, xl: 10 }]}>
+              <Row
+                gutter={[
+                  { xs: 0, md: 8, lg: 16 },
+                  { xs: 0, md: 6, lg: 8, xl: 10 },
+                ]}
+              >
                 {pokemon.stats.map((stats: Stats) => {
                   return (
                     <>
-                      <Col span={8}>
-                        <Text style={{ margin: 0, fontSize: 16 }}>{stats.stat.name.toUpperCase()}</Text>
+                      <Col xs={6}>
+                        <Text>{stats.stat.name.toUpperCase()}</Text>
                       </Col>
                       <Col span={1}>:</Col>
-                      <Col span={15}>
+                      <Col xs={17}>
                         <Row gutter={[24, 0]}>
-                          <Col span={20}>
-                            <Progress percent={stats.base_stat / 2} size={["100%", 16]} showInfo={false} />
+                          <Col xs={18}>
+                            <Progress
+                              percent={stats.base_stat / 1.5}
+                              size={["100%", 16]}
+                              showInfo={false}
+                              strokeColor={stats_color[stats.stat.name]}
+                            />
                           </Col>
-                          <Col span={4}>
+                          <Col span={6}>
                             <Text className="stat-base">{stats.base_stat}</Text>
                           </Col>
                         </Row>
@@ -171,7 +180,7 @@ const PokemonDetails: React.FC = () => {
                         <span>
                           <img
                             src={logo_types[`${types.type.name}`]}
-                            width={28}
+                            className="type-logo"
                             alt={`Type logo: ${logo_types[`${types.type.name}`]}`}
                           />
                         </span>
@@ -188,7 +197,7 @@ const PokemonDetails: React.FC = () => {
             </Card>
           </Col>
 
-          <Col span={12} style={{ textAlign: "center" }}>
+          <Col xs={0} lg={12} className="img-mode-c">
             <Image src={pokemon.sprites.front_default} className="img-pokemon"></Image>
             <div className="img-shadow"></div>
           </Col>
@@ -218,12 +227,21 @@ const type_color: typeColorInterface = {
   fairy: "#e989e8",
 };
 
+const stats_color: StatsColorInterface = {
+  hp: "#ED2E49",
+  attack: "#FEA726",
+  defense: "#0091EA",
+  "special-attack": "#CB6CE6",
+  "special-defense": "#8C52FF",
+  speed: "#00BF63",
+};
+
 const cardStyle: React.CSSProperties = {
   padding: "1rem",
   width: "100%",
   maxWidth: "40vw",
   borderRadius: "12px",
-  boxShadow: "0 0.5rem 1rem rgba(0, 21, 41, 0.2",
+  boxShadow: "0 0.5rem 1rem rgba(0, 21, 41, 0.2)",
 };
 
 export default PokemonDetails;

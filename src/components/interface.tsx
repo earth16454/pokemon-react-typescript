@@ -87,3 +87,7 @@ export interface typeColorInterface {
 export interface LogoTypes {
   [key: string]: string;
 }
+
+export interface StatsColorInterface {
+  [key: string]: string;
+}
